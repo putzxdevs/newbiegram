@@ -44,17 +44,15 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Create virtual environment
-        # A dedicated venv keeps the console scripts (pytest) on PATH and
-        # avoids relying on whatever Python the runner happens to expose.
-        run: uv venv .venv --python ${{ matrix.python-version }}
+        run: uv venv .venv --python ${{ matrix.python-version }} --clear
 
       - name: Install project and test dependencies
         run: |
-          uv pip install --python .venv/bin/python -e .
-          uv pip install --python .venv/bin/python pytest pytest-asyncio pytest-timeout aiosqlite pyaes
+          uv pip install -e .
+          uv pip install pytest pytest-asyncio pytest-timeout aiosqlite pyaes
 
       - name: Run tests
-        run: .venv/bin/python -m pytest tests/ -v --timeout=600
+        run: uv run python -m pytest tests/ -v --timeout=600
 
   build:
     name: Build and verify distributions
@@ -75,12 +73,8 @@ jobs:
         run: uvx twine check dist/*
 
       - name: Assert the wheel carries the source version
-        # PKG-INFO at the repo root used to shadow this and ship a 0.2.8 wheel.
         run: |
           set -euo pipefail
-          # Hatch derives the version from newbiegram/__init__.py ([tool.hatch.version]),
-          # so read it from source: the package is not installed at this point, so
-          # `import newbiegram` would fail on its missing dependencies.
           version=$(sed -n 's/^__version__ *= *.\(.*\).$/\1/p' newbiegram/__init__.py)
           echo "source version: ${version}"
           ls dist/ | grep -F "${version}" || {
@@ -92,6 +86,6 @@ jobs:
       - name: Install the wheel and smoke-test the import
         run: |
           set -euo pipefail
-          uv venv /tmp/wheeltest --python 3.12
+          uv venv /tmp/wheeltest --python 3.12 --clear
           uv pip install --python /tmp/wheeltest/bin/python dist/*.whl
           /tmp/wheeltest/bin/python -c "import newbiegram; print(newbiegram.__version__)"
