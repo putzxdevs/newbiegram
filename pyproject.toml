@@ -1,0 +1,274 @@
+[project]
+name = "newbiegram"
+dynamic = ["version"]
+description = "NewbieGram — asynchronous Telegram MTProto API framework in Python (fork of Hydrogram), tracking the latest Telegram API layer."
+authors = [
+    { name = "NewbieGram contributors", email = "newbiegram@users.noreply.github.com" },
+]
+readme = "README.md"
+license = "LGPL-3.0-or-later"
+requires-python = "<4.0, >=3.12"
+dependencies = [
+    "pyaes>=1.6.1",
+    "aiosqlite>=0.19",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Internet",
+    "Topic :: Communications",
+    "Topic :: Communications :: Chat",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+keywords = ["telegram chat messenger mtproto api client library python"]
+
+[tool.hatch.version]
+path = "newbiegram/__init__.py"
+
+# Used to call hatch_build.py
+[tool.hatch.build.hooks.custom]
+
+[project.urls]
+homepage = "https://github.com/putzxdevs/newbiegram"
+tracker = "https://github.com/putzxdevs/newbiegram/issues"
+community = "https://t.me/putzxdevs"
+source = "https://github.com/putzxdevs/newbiegram"
+documentation = "https://github.com/putzxdevs/newbiegram/blob/main/README.md"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "ruff>=0.5.4",
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.23.2",
+    "pytest-cov>=4.1.0",
+    "pytest-timeout>=2.2.0",
+    "twine>=4.0.2",
+    "pre-commit>=3.7.1",
+]
+
+[project.optional-dependencies]
+# Optional accelerators probed at runtime by newbiegram/crypto/aes.py and newbiegram/__init__.py
+fast = [
+    "tgcrypto>=1.2.5",
+    "uvloop>=0.19",
+]
+# Kept in sync with [tool.rye].dev-dependencies. pip/uv ignore the rye table, so
+# without this a contributor running `pip install -e ".[dev]"` gets no pytest
+# plugins and the suite dies on an unknown `asyncio_mode` config option.
+dev = [
+    "ruff>=0.5.4",
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.23.2",
+    "pytest-cov>=4.1.0",
+    "pytest-timeout>=2.2.0",
+    "twine>=4.0.2",
+    "pre-commit>=3.7.1",
+]
+docs = [
+    "sphinx>=7.4.7",
+    "furo>=2024.7.18",
+    "sphinx-autobuild>=2024.4.16",
+    "sphinx-copybutton>=0.5.2",
+    "pygments>=2.18.0",
+    "towncrier>=23.11.0",
+    "sphinxcontrib-towncrier>=0.4.0a0",
+]
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    ".github/",
+    "dev_tools/",
+    "docs/",
+    "news/",
+    "tests/",
+    ".editorconfig",
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    "CONTRIBUTING.md",
+    "NEWS.rst",
+    "requirements.lock",
+    "requirements-dev.lock",
+]
+
+[tool.hatch.build.targets.wheel]
+ignore-vcs = true
+packages = ["newbiegram"]
+
+[tool.ruff]
+line-length = 99
+# Must match project.requires-python (>=3.12): newbiegram/socks uses PEP 695
+# `type` aliases and generic type-parameter lists, which are 3.12+ syntax.
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "FURB", # refurb
+    "I",    # isort
+    "E",    # pycodestyle: error
+    "W",    # pycodestyle: warning
+    "UP",   # pyupgrade
+    "F",    # pyflakes
+    "SIM",  # flake8-simplify
+    "RET",  # flake8-return
+    "C4",   # flake8-comprehensions
+    "PTH",  # flake8-use-pathlib
+    "PERF", # perflint
+    "N",    # pep8-naming
+    "RUF",  # ruff
+    "G",    # flake8-logging-format
+    "TID",  # flake8-tidy-imports
+    "TCH",  # flake8-type-checking
+    "FA",   # flake8-future-annotations
+    "PL",   # pylint
+]
+ignore = [
+    "ambiguous-unicode-character-string",
+    "ambiguous-unicode-character-docstring",
+    "ambiguous-unicode-character-comment",
+    "whitespace-before-punctuation",
+    "try-except-in-loop",
+    "PLR09",
+    "magic-value-comparison",
+    "too-many-nested-blocks",
+    "unspecified-encoding",
+    "redefined-loop-name",
+    "global-statement",
+    # Rewrites re.sub(r"literal", ...) into str.replace(), which changes regex
+    # semantics. This has already corrupted compiler/errors/compiler.py once.
+    "unraw-re-pattern",
+    # Rewrites legacy `# noqa: CODE` comments into the preview
+    # `# ruff: ignore[code]` syntax, which older ruff releases cannot parse.
+    "unused-noqa",
+    "noqa-comments",
+    # Cosmetic-only rules across a large pre-existing codebase.
+    "line-too-long",
+    "too-many-statements-in-try-clause",
+    "non-empty-init-module",
+    "typing-only-standard-library-import",
+    # Keep ignore entries as rule names, not codes: this ruff release rewrites
+    # codes into names automatically and silently drops unknown ones.
+    "rule-codes-in-selectors",
+    # Decorator `func=None` defaults are required: `on_message` and friends
+    # must stay usable both as `@on_message` and `@on_message(filters.TEXT)`.
+    "method-receiver-default",
+]
+preview = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["newbiegram"]
+
+# Code generated by compiler/ from the TL schema. Regenerated on build, so it is
+# not hand-maintained and must not gate CI.
+[tool.ruff.lint.per-file-ignores]
+"newbiegram/raw/functions/*" = ["ALL"]
+"newbiegram/raw/types/*" = ["ALL"]
+"newbiegram/raw/base/*" = ["ALL"]
+"newbiegram/raw/all.py" = ["ALL"]
+"newbiegram/errors/exceptions/*" = ["ALL"]
+"newbiegram/errors/pyrogram_errors/_core/*" = ["ALL"]
+# Vendored PySocks. Names like _negotiate_SOCKS5 are upstream API; bind()/connect()
+# intentionally return None because they delegate to the original socket method.
+"newbiegram/socks/*" = [
+    "invalid-function-name", "implicit-return", "mutable-class-default", "used-dummy-variable", "invalid-class-name", "non-pep604-annotation-union", "no-self-use",
+    "unused-unpacked-variable", "literal-membership", "if-else-block-instead-of-if-exp", "os-listdir", "subclass-builtin",
+    # SOCKS protocol constants (RSV, STANDALONE, CONNECT, UDP_ASSOCIATE) are
+    # RFC wire-format names, deliberately uppercase.
+    "non-lowercase-variable-in-function", "import-outside-top-level",
+]
+# Public API kept for backwards compatibility with Pyrogram/Hydrogram naming.
+"newbiegram/filters.py" = ["invalid-class-name"]
+"newbiegram/methods/chats/get_forum_topics.py" = ["used-dummy-variable"]
+# Public types subclass str/list by design; changing them would break isinstance
+# checks in user code and in this library.
+"newbiegram/types/list.py" = ["subclass-builtin"]
+"newbiegram/types/user_and_chats/user.py" = ["subclass-builtin"]
+"newbiegram/types/messages_and_media/message.py" = ["subclass-builtin"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers --strict-config"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff.format]
+docstring-code-format = true
+preview = true
+exclude = [
+    "newbiegram/raw/functions",
+    "newbiegram/raw/types",
+    "newbiegram/raw/base",
+    "newbiegram/raw/all.py",
+    "newbiegram/errors/exceptions",
+]
+
+[tool.towncrier]
+package = "newbiegram"
+filename = "NEWS.rst"
+directory = "news/"
+template = "news/.template.rst.jinja2"
+issue_format = "`#{issue} <https://github.com/putzxdevs/newbiegram/issues/{issue}>`_"
+
+[[tool.towncrier.section]]
+path = ""
+
+[[tool.towncrier.type]]
+directory = "feature"
+name = "Features"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "bugfix"
+name = "Bugfixes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "doc"
+name = "Improved Documentation"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removal"
+name = "Deprecations and Removals"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "misc"
+name = "Misc"
+showcontent = true
+
+[tool.rye.scripts]
+clean = { chain = ["clean:docs", "clean:api"] }
+"clean:api" = { cmd = "rm -rf newbiegram/errors/exceptions newbiegram/raw/all.py newbiegram/raw/base newbiegram/raw/functions newbiegram/raw/types" }
+"clean:docs" = { cmd = "rm -rf docs/build docs/source/api/bound-methods docs/source/api/methods docs/source/api/types docs/source/telegram" }
+
+api = { chain = ["api:raw", "api:errors"] }
+"api:raw" = { call = "compiler.api.compiler:start" }
+"api:errors" = { call = "compiler.errors.compiler:start" }
+
+docs = { chain = ["docs:compile", "docs:serve"] }
+"docs:compile" = { cmd = "python compiler/docs/compiler.py" }
+"docs:serve" = { cmd = "sphinx-build -b html docs/source docs/build/html -j auto" }
+live-docs = { cmd = "sphinx-autobuild docs/source docs/build/html -j auto --watch src" }
+
+towncrier = { cmd = "towncrier build --yes" }
+towncrier-draft = { cmd = "towncrier build --draft" }

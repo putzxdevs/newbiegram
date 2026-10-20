@@ -1,0 +1,11 @@
+## Include
+include README.md COPYING COPYING.lesser NOTICE
+recursive-include compiler *.py *.tl *.tsv *.txt
+recursive-include tests *.py
+
+## Exclude
+prune newbiegram/errors/exceptions
+prune newbiegram/raw/functions
+prune newbiegram/raw/types
+prune newbiegram/raw/base
+exclude newbiegram/raw/all.py
