@@ -1,15 +1,15 @@
-#  Hydrogram - Telegram MTProto API Client Library for Python
+#  NewbieGram - Telegram MTProto API Client Library for Python
 #  Copyright (C) 2017-2023 Dan <https://github.com/delivrance>
-#  Copyright (C) 2023-present Hydrogram <https://github.com/putzxdevs/newbiegram>
+#  Copyright (C) 2023-present NewbieGram contributors <https://github.com/putzxdevs/newbiegram>
 #
-#  This file is part of Hydrogram.
+#  This file is part of NewbieGram, a fork of Hydrogram.
 #
-#  Hydrogram is free software: you can redistribute it and/or modify
+#  NewbieGram is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU Lesser General Public License as published
 #  by the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  Hydrogram is distributed in the hope that it will be useful,
+#  NewbieGram is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Lesser General Public License for more details.
@@ -79,7 +79,7 @@ CPU_COUNT = _cpu_count() or 1
 
 
 class Client(Methods):
-    """Hydrogram Client, the main means for interacting with Telegram.
+    """NewbieGram Client, the main means for interacting with Telegram.
 
     Parameters:
         name (``str``):
@@ -95,7 +95,7 @@ class Client(Methods):
 
         app_version (``str``, *optional*):
             Application version.
-            Defaults to "Hydrogram x.y.z".
+            Defaults to "NewbieGram x.y.z".
 
         device_model (``str``, *optional*):
             Device model.
@@ -160,7 +160,7 @@ class Client(Methods):
 
         workdir (``str``, *optional*):
             Define a custom working directory.
-            The working directory is the location in the filesystem where Hydrogram will store the session files.
+            The working directory is the location in the filesystem where NewbieGram will store the session files.
             Defaults to the parent directory of the main script.
 
         plugins (``dict``, *optional*):
@@ -368,9 +368,9 @@ class Client(Methods):
         if self.bot_token:
             return await self.sign_in_bot(self.bot_token)
 
-        print(f"Welcome to Hydrogram (version {__version__})")
+        print(f"Welcome to NewbieGram (version {__version__})")
         print(
-            f"Hydrogram is free software and comes with ABSOLUTELY NO WARRANTY. Licensed\n"
+            f"NewbieGram is free software and comes with ABSOLUTELY NO WARRANTY. Licensed\n"
             f"under the terms of the {__license__}.\n"
         )
 
