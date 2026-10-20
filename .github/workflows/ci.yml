@@ -43,13 +43,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Create virtual environment
+        # A dedicated venv keeps the console scripts (pytest) on PATH and
+        # avoids relying on whatever Python the runner happens to expose.
+        run: uv venv .venv --python ${{ matrix.python-version }}
+
       - name: Install project and test dependencies
         run: |
-          uv pip install --system -e .
-          uv pip install --system pytest pytest-asyncio pytest-timeout aiosqlite pyaes
+          uv pip install --python .venv/bin/python -e .
+          uv pip install --python .venv/bin/python pytest pytest-asyncio pytest-timeout aiosqlite pyaes
 
       - name: Run tests
-        run: pytest tests/ -v --timeout=600
+        run: .venv/bin/python -m pytest tests/ -v --timeout=600
 
   build:
     name: Build and verify distributions
@@ -73,7 +78,11 @@ jobs:
         # PKG-INFO at the repo root used to shadow this and ship a 0.2.8 wheel.
         run: |
           set -euo pipefail
-          version=$(python -c "import newbiegram; print(newbiegram.__version__)")
+          # Hatch derives the version from newbiegram/__init__.py ([tool.hatch.version]),
+          # so read it from source: the package is not installed at this point, so
+          # `import newbiegram` would fail on its missing dependencies.
+          version=$(sed -n 's/^__version__ *= *.\(.*\).$/\1/p' newbiegram/__init__.py)
+          echo "source version: ${version}"
           ls dist/ | grep -F "${version}" || {
             echo "::error::No distribution built for version ${version}"
             ls dist/
